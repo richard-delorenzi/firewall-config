@@ -1,0 +1,68 @@
+#!/bin/sh
+
+##to install
+#copy to /etc/init.d/my-firewall
+#sudo update-rc.d my-firewall defaults
+
+### BEGIN INIT INFO
+# Provides:          my-firewall
+# Required-Start:    $local_fs
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: A simple firewall (blocks user:david from internet)
+# Description:       
+### END INIT INFO
+
+set -e
+PATH="/sbin:/bin:/usr/sbin:/usr/bin"
+
+tables(){
+	iptables  "$@"
+	ip6tables "$@"
+}
+
+
+## Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    echo "Starting script my-firewall"
+    ##OUTPUT	
+    ##allow talk to local
+    iptables  -I OUTPUT 1 -m iprange --dst-range 127.0.0.1 -j ACCEPT
+    ip6tables -I OUTPUT 1 -m iprange --dst-range ::1       -j ACCEPT
+    ##allow proxies to talk on our behalf
+    tables -I OUTPUT 2 -m owner --uid-owner proxy  -j ACCEPT
+    tables -I OUTPUT 3 -m owner --uid-owner dnsmasq -j ACCEPT
+    ##allow ssh
+    tables -I OUTPUT 4 -p tcp --destination-port ssh -j ACCEPT
+    ## until dns working allow acces by all to external dns
+    tables -I OUTPUT 1 -p udp --destination-port domain -j ACCEPT
+    ##else return error
+    iptables  -I OUTPUT 5 -j REJECT --reject-with icmp-admin-prohibited
+    ip6tables -I OUTPUT 5 -j REJECT --reject-with icmp6-adm-prohibited
+    #else
+    tables -P OUTPUT DROP
+
+    ##INPUT
+    ##Can talk to self
+    iptables  -I INPUT 1 -m iprange --src-range 127.0.0.1 -j ACCEPT
+    ip6tables -I INPUT 1 -m iprange --src-range ::1 -j ACCEPT   
+    ##Allow others to talk to the few services that are listed here
+    tables -I INPUT 2 -p tcp --destination-port 33936 -j ACCEPT #local ssh port
+    tables -I INPUT 3 -p tcp --destination-port 51413 -j ACCEPT #can't remember
+    tables -P INPUT DROP
+
+    ##NO FORWARD
+    tables -P FORWARD DROP
+    ;;
+  stop)
+    echo "Stopping script my-firewall"
+    ;;
+  *)
+    echo "Usage: /etc/init.d/my-firewall {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0
