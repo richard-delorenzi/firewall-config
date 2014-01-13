@@ -18,8 +18,19 @@ set -e
 PATH="/sbin:/bin:/usr/sbin:/usr/bin"
 
 tables(){
-	iptables  "$@"
-	ip6tables "$@"
+    iptables  "$@"
+    ip6tables "$@"
+}
+
+clearall(){
+    _clear ip6tables
+    _clear iptables
+}
+
+_clear(){
+    cmd="$1"
+    "$cmd" -F OUTPUT
+    "$cmd" -F INPUT
 }
 
 
@@ -27,6 +38,8 @@ tables(){
 case "$1" in
   start)
     echo "Starting script my-firewall"
+    clearall
+
     ##OUTPUT	
     ##allow talk to local
     iptables  -I OUTPUT 1 -m iprange --dst-range 127.0.0.1 -j ACCEPT
@@ -36,11 +49,12 @@ case "$1" in
     tables -I OUTPUT 3 -m owner --uid-owner dnsmasq -j ACCEPT
     ##allow ssh
     tables -I OUTPUT 4 -p tcp --destination-port ssh -j ACCEPT
-    ## until dns working allow acces by all to external dns
-    tables -I OUTPUT 1 -p udp --destination-port domain -j ACCEPT
+    ## until dns working allow access by all to external dns
+    tables -I OUTPUT 5 -p udp --destination-port domain -j ACCEPT
+    tables -I INPUT  1 -p udp --destination-port domain -j ACCEPT
     ##else return error
-    iptables  -I OUTPUT 5 -j REJECT --reject-with icmp-admin-prohibited
-    ip6tables -I OUTPUT 5 -j REJECT --reject-with icmp6-adm-prohibited
+    iptables  -I OUTPUT 6 -j REJECT --reject-with icmp-admin-prohibited
+    ip6tables -I OUTPUT 6 -j REJECT --reject-with icmp6-adm-prohibited
     #else
     tables -P OUTPUT DROP
 
@@ -58,6 +72,9 @@ case "$1" in
     ;;
   stop)
     echo "Stopping script my-firewall"
+    clearall
+    tables -P OUTPUT ACCEPT
+    tables -P INPUT  ACCEPT
     ;;
   *)
     echo "Usage: /etc/init.d/my-firewall {start|stop}"
