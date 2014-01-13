@@ -11,15 +11,17 @@ ufw default deny incoming
 ufw default reject outgoing
 
 ##ssh	
-ufw allow SSH
+ufw allow in SSH
+ufw allow out SSH
 ufw allow in 33936/tcp #local ssh
 
 ##bit torrent
-ufw allow Transmission
+ufw allow in Transmission
+ufw allow out Transmission
 
 #email
-ufw allow IMAP
-ufw allow SMTP
+ufw allow out IMAP
+ufw allow out SMTP
 
 cp -f "$ThisDir"/my-firewall /etc/init.d
 chmod u+x,+X /etc/init.d/my-firewall
