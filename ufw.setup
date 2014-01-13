@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+PATH="/sbin:/bin:/usr/sbin:/usr/bin"
+ThisDir="$(dirname $0)"
+
+#lock down	
+ufw --force reset
+ufw enable
+ufw default deny incoming
+ufw default reject outgoing
+
+##ssh	
+ufw allow SSH
+ufw allow in 33936/tcp #local ssh
+
+##bit torrent
+ufw allow Transmission
+
+#email
+ufw allow IMAP
+ufw allow SMTP
+
+cp -f "$ThisDir"/my-firewall /etc/init.d
+/etc/init.d/my-firewall start
+
