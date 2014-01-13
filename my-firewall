@@ -22,39 +22,17 @@ _tables(){
     ip6tables "$@"
 }
 
-_delete(){
-    table=$1
-    shift
-    _tables -D $table "$@" 2>/dev/null || true
+_privUser() {
+    _tables $1 OUTPUT $2 -m owner --uid-owner "$3" -j ACCEPT 
 }
 
-_rawadd(){
-    table=$1
-    shift
-    _tables -I $table 1 "$@" 
+removePrivalagedUser(){
+    _privUser "-D" "" "$1"  2>/dev/null || true
 }
 
-_add(){
-    _delete "$@"
-    _rawadd "$@"
-}
-
-allow(){
-    cmd=$1
-    shift
-    _$cmd _add "$@"
-}
-
-remove(){
-    cmd=$1
-    shift
-    _$cmd _delete "$@"
-}
-
-_owner(){
-    cmd="$1"
-    user="$2"
-    $cmd OUTPUT -m owner --uid-owner $user -j ACCEPT
+addPrivalagedUser(){
+    removePrivalagedUser $1
+    _privUser "-I" "1" "$1"
 }
 
 
@@ -64,14 +42,14 @@ case "$1" in
     echo "Starting script my-firewall"
 
     ##allow proxies to talk on our behalf
-    allow owner proxy
-    allow owner dnsmasq
+    addPrivalagedUser proxy
+    addPrivalagedUser dnsmasq
   
     ;;
   stop)
     echo "Stopping script my-firewall"
-    remove owner proxy
-    remove owner dnsmasq
+    removePrivalagedUser proxy
+    removePrivalagedUser dnsmasq
     ;;
   *)
     echo "Usage: /etc/init.d/my-firewall {start|stop}"

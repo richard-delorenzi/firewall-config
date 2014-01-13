@@ -22,5 +22,6 @@ ufw allow IMAP
 ufw allow SMTP
 
 cp -f "$ThisDir"/my-firewall /etc/init.d
+chmod u+x,+X /etc/init.d/my-firewall
 /etc/init.d/my-firewall start
 
