@@ -19,9 +19,12 @@ ufw allow in 33936/tcp #local ssh
 ufw allow in Transmission
 ufw allow out Transmission
 
-#email
+##email
 ufw allow out IMAP
 ufw allow out SMTP
+
+##teredo
+#ufw allow out 3544/udp
 
 cp -f "$ThisDir"/my-firewall /etc/init.d
 chmod u+x,+X /etc/init.d/my-firewall
