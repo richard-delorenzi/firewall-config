@@ -23,9 +23,16 @@ ufw allow out Transmission
 ufw allow out IMAP
 ufw allow out SMTP
 
+##gmail — gmail is ignoring proxy settings.
+host -t A  mail.google.com | 
+  sed -nre "s/.*has address (([0-9]*\.)*[0-9]*)/\1/p" | 
+  xargs -n1 -i{} ufw allow proto tcp to {} port 80
+
 ##teredo
 #ufw allow out 3544/udp
 
+
+##some hand crafted iptables
 cp -f "$ThisDir"/my-firewall /etc/init.d
 chmod u+x,+X /etc/init.d/my-firewall
 /etc/init.d/my-firewall start
