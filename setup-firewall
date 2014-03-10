@@ -46,9 +46,8 @@ ufw allow out IMAP
 ufw allow out SMTP
 
 ##gmail — gmail is ignoring proxy settings.
-allow in mail.google.com tcp $http,$https A
-allow in gmail.com       tcp $http,$https A
-
+allow out mail.google.com tcp $http,$https A
+allow out gmail.com       tcp $http,$https A
 
 ##teredo
 #ufw allow out 3544/udp
