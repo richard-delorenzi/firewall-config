@@ -54,7 +54,14 @@ allow out gmail.com       tcp $http,$https A
 
 
 ##some hand crafted iptables
+#install
 cp -f "$ThisDir"/my-firewall /etc/init.d
 chmod u+x,+X /etc/init.d/my-firewall
-/etc/init.d/my-firewall start
+update-rc.d my-firewall defaults
+#start
+if which invoke-rc.d >/dev/null 2>&1; then
+    invoke-rc.d my-firewall start
+else
+    /etc/init.d/my-firewall start
+fi
 

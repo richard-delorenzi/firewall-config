@@ -14,7 +14,6 @@
 # Description:       
 ### END INIT INFO
 
-set -e
 PATH="/sbin:/bin:/usr/sbin:/usr/bin"
 
 _tables(){
@@ -38,7 +37,7 @@ addPrivalagedUser(){
 
 ## Carry out specific functions when asked to by the system
 case "$1" in
-  start)
+  "start" | "restart" | "reload" | "force-reload" )
     echo "Starting script my-firewall"
 
     ##allow proxies to talk on our behalf
@@ -46,7 +45,7 @@ case "$1" in
     addPrivalagedUser dnsmasq
   
     ;;
-  stop)
+  "stop")
     echo "Stopping script my-firewall"
     removePrivalagedUser proxy
     removePrivalagedUser dnsmasq
