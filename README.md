@@ -3,10 +3,12 @@ firewall-config
 
 A very strict firewall config, to use with http and dns proxys.
 
+It blocks almost everything, with some exceptions of ssh, and a few specific sites, it also allows the users proxy and dnsmasq through. These “users” run the squid web proxy and dns proxy, they fetch stuff on our behalf, if squid-guard is properly installed then squid will filter what we can recieve. The dns config below, and the filewall ensure we only connect to trusted dns servers.
+
 Requires Debian with Linux kernel (could easily be modified to work with any Gnu/Linux system, ufw, a proxy on port 3128, and dnsmasq
 
     apt-get install dnsmasq
-    apt-get install squid3 squidguard
+    apt-get install squid3
     apt-get install ufw
 
 now configure dnsmasq
