@@ -5,9 +5,9 @@ A very strict firewall config, to use with http and dns proxys.
 
 Requires Debian with Linux kernel (could easily be modified to work with any Gnu/Linux system, ufw, a proxy on port 3128, and dnsmasq
 
-`apt-get install dnsmasq`
-`apt-get install squid3 squidguard`
-`apt-get install ufw`
+    apt-get install dnsmasq
+    apt-get install squid3 squidguard
+    apt-get install ufw
 
 now configure dnsmasq
 
@@ -20,6 +20,6 @@ now configure dnsmasq
 
 now configure squid: I can't remember the details, it may just work without changing any thing.
 
-`./setup-firewall`
+    ./setup-firewall
 
 Most of the config is in `setup-firewall` and uses ufw, but some uses iptables directly and is in `my-filewall` this script is copied to `/etc/init.d` by the setup script.
